@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: blog-ui-service
+spec:
+    type: LoadBalancer
+    ports:
+        - port: 8090
+          targetPort: 5000
+    selector:
+        app: blog-ui

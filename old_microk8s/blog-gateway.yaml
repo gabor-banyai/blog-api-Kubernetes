@@ -1,0 +1,38 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: blog-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: blog-istio
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - blog-gateway
+  http:
+  - match:
+    - uri:
+        exact: /
+    - uri:
+        exact: /api/v1/users/
+    - uri:
+        exact: /api/v1/blogposts/
+    route:
+    - destination:
+        host: flask-api-service
+        port:
+          number: 5000
+

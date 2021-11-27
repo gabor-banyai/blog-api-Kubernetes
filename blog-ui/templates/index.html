@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <style type="text/css">
+            body {
+                background: darkgreen;
+                color: white;
+            }
+            div.container {
+                max-width: 500px;
+                margin: 100px auto;
+                border: 20px solid white;
+                padding: 10px;
+                text-align: center;
+            }
+            h4 {
+                text-transform: uppercase;
+            }
+        </style>
+    </head>
+    <body>
+        <ul>
+            {% for member in members: %}
+            <li>
+                <h2> Title: {{ member.title }}</h2> <br />
+                <div> Contents: {{ member.contents }} </div>
+                <p> ID: {{member.id}} </p> </div>
+                <p> Created at: {{members.created_at }} </p>
+
+                <form action="{{url + '/api/v1/blogposts/delete/' + member.id}}" method="POST">
+                    <input type="submit" value="Delete this blogpost" />
+                </form> 
+                <hr>
+
+            </li>
+            {% endfor %}
+        </ul>
+
+        Create another blog!
+        <br><br>
+        <form action="{{url + '/api/v1/blogposts/'}}" method="POST">
+          <label for="title">Blog Title</label><br>
+          <input type="text" id="title" name="title" value=""><br>
+          <label for="contents">Blog Contents</label><br>
+          <input type="text" id="contents" name="contents" value=""><br>
+          <label for="user_id">User-ID</label><br>
+          <input type="text" id="user_id" name="user_id" value=""><br>
+          <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>

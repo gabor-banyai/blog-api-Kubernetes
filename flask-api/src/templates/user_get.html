@@ -1,0 +1,19 @@
+<html>
+    <h1 style="color: #5e9ca0;">See all the users!</h1>
+
+    <body>
+        {% for user in users: %}
+            <p> Username: {{ user.name }}</p>
+            <p> Email: {{ user.email }} </p>
+            <p> ID: {{user.id}} </p>
+
+            <form action="{{'/api/v1/users/delete/' + user.id}}" method="POST">
+                <input type="submit" value="Delete this user" />
+            </form> 
+
+            <hr>
+
+        {% endfor %}
+
+    </body>
+</html>

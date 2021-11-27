@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: blog-ui-deployment
+    labels:
+        app: blog-ui
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: blog-ui
+    template:
+        metadata:
+            labels:
+                app: blog-ui
+        spec:
+            containers:
+                - name: blog-ui-container
+                  image: localhost:32000/blog-ui:v1
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                      - containerPort: 5000
+                  envFrom:
+                      - configMapRef:
+                          name: blogdb-config
+                  tty: true
+                  stdin: true

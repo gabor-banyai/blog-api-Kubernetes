@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Blog Homepage</title>
+  </head>
+  <body>
+    Hello and welcome. Click on the button to go to the blogposts. 
+    <form action="/api/v1/blogposts">
+      <input type="submit" value="Go to blogposts" />
+   </form>
+    Fill the form below to add any blogposts
+
+    <br><br>
+    <form action="/api/v1/blogposts/" method="POST">
+      <label for="title">Blog Title</label><br>
+      <input type="text" id="title" name="title" value=""><br>
+      <label for="contents">Blog Contents</label><br>
+      <input type="text" id="contents" name="contents" value=""><br>
+      <label for="user_id">User-ID</label><br>
+      <input type="text" id="user_id" name="user_id" value=""><br>
+      <input type="submit" value="Submit">
+    </form>
+
+    <br><br>
+    Form for users
+    <form action="/api/v1/users/" method="POST">
+      <label for="title">Create User</label><br>
+      <input type="text" id="name" name="name" value=""><br>
+      <label for="email">Email</label><br>
+      <input type="text" id="email" name="email" value=""><br>
+      <label for="password">Password</label><br>
+      <input type="text" id="password" name="password" value=""><br>
+      <input type="submit" value="Submit">
+    </form>
+
+    <form action="/api/v1/users">
+      <input type="submit" value="Go to users" />
+   </form>
+  </body>
+</html>

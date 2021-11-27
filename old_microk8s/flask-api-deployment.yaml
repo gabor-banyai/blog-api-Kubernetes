@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-api-deployment
+  labels:
+    app: flask-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-api
+  template:
+    metadata:
+      labels:
+        app: flask-api
+    spec:
+      containers:
+      - name: flask-api-container
+        image: localhost:32000/flask-api:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        envFrom:
+            - configMapRef:
+                name: blogdb-config
+        env:
+          # - name: SERVICE_POSTGRES_SERVICE_HOST
+            # value: service-postgres.default.svc.cluster.local
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: blogdb-secret
+                key: POSTGRES_PASSWORD

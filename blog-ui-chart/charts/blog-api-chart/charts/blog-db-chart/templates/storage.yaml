@@ -1,0 +1,29 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+    name: {{ include "blog-db-chart.fullname" . }}-volume
+    labels:
+        type: local
+        {{- include "blog-db-chart.labels" . | nindent 8 }}
+spec:
+    storageClassName: {{ .Values.storageClassName }}
+    capacity:
+        storage: {{ .Values.storage }}
+    accessModes:
+        - ReadWriteMany
+    hostPath:
+        path: {{ .Values.storagePath | quote }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: {{ include "blog-db-chart.fullname" . }}-claim
+    labels:
+        {{- include "blog-db-chart.labels" . | nindent 8 }}
+spec:
+    storageClassName: {{ .Values.storageClassName }}
+    accessModes:
+        - ReadWriteMany
+    resources:
+        requests:
+            storage: {{ .Values.storage }}

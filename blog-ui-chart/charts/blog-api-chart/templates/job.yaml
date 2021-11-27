@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+    name: {{ include "blog-api-chart.fullname" . }}-init
+    labels:
+        {{- include "blog-api-chart.labels" . | nindent 8 }}
+spec:
+    template:
+        metadata:
+            annotations:
+                sidecar.istio.io/inject: "false"
+        spec:
+            containers:
+                - name: {{ .Chart.Name }}-init
+                  image: "{{ .Values.initJob.repository }}:{{ .Values.initJob.appVersion }}"
+                  imagePullPolicy: {{ .Values.initJob.pullPolicy }}
+                  envFrom:
+                    - configMapRef:
+                        name: {{ include "blog-api-chart.fullname" . }}-config
+                  env:
+                    - name: POSTGRES_PASSWORD
+                      valueFrom:
+                          secretKeyRef:
+                              name: {{ include "blog-api-chart.fullname" . }}-secret
+                              key: POSTGRES_PASSWORD
+            initContainers:
+                - name : {{ .Chart.Name }}-wait
+                  image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.appVersion }}"
+                  imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+                  args:
+                      - "pod"
+                      - "-lapp.kubernetes.io/name=blog-db-chart"
+            restartPolicy: {{ .Values.initJob.restartPolicy}}
+    backoffLimit: {{ .Values.initJob.backoffLimit}}

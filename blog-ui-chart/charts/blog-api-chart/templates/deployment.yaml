@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: {{ include "blog-api-chart.fullname" . }}-deployment
+    labels:
+        {{- include "blog-api-chart.labels" . | nindent 8 }}
+spec:
+    replicas: {{ .Values.replicaCount }}
+    selector:
+        matchLabels:
+            {{- include "blog-api-chart.selectorLabels" . | nindent 12 }}
+    template:
+        metadata:
+            labels:
+                {{- include "blog-api-chart.selectorLabels" . | nindent 16 }}
+        spec:
+        {{- with .Values.imagePullSecrets }}
+            imagePullSecrets:
+                {{- toYaml . | nindent 16 }}
+        {{- end }}
+            serviceAccountName: {{ include "blog-api-chart.serviceAccountName" . }}
+            securityContext:
+                {{- toYaml .Values.podSecurityContext | nindent 16 }}
+            containers:
+                - name: {{ .Chart.Name }}
+                  securityContext:
+                      {{- toYaml .Values.securityContext | nindent 22 }}
+                  image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+                  imagePullPolicy: {{ .Values.image.pullPolicy }}
+                  ports:
+                      - name: http
+                        containerPort: 5000
+                        protocol: TCP
+                  envFrom:
+                    - configMapRef:
+                        name: {{ include "blog-api-chart.fullname" . }}-config
+                  env:
+                    - name: POSTGRES_PASSWORD
+                      valueFrom:
+                          secretKeyRef:
+                              name: {{ include "blog-api-chart.fullname" . }}-secret
+                              key: POSTGRES_PASSWORD
+                  livenessProbe:
+                      httpGet:
+                          path: /
+                          port: http
+                  readinessProbe:
+                      httpGet:
+                          path: /
+                          port: http
+                  resources:
+                    {{- toYaml .Values.resources | nindent 22 }}
+            initContainers:
+                - name : {{ .Chart.Name }}-init
+                  image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.appVersion }}"
+                  imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+                  args:
+                      - "job"
+                      - "{{ include "blog-api-chart.fullname" . }}-init"
+            {{- with .Values.nodeSelector }}
+            nodeSelector:
+                {{- toYaml . | nindent 16 }}
+            {{- end }}
+        {{- with .Values.affinity }}
+            affinity:
+                {{- toYaml . | nindent 16 }}
+        {{- end }}
+        {{- with .Values.tolerations }}
+            tolerations:
+                {{- toYaml . | nindent 16 }}
+        {{- end }}

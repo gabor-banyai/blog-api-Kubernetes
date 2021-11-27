@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: blogdb-deployment
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: blogdb-postgres
+    template:
+        metadata:
+            labels:
+                app: blogdb-postgres
+        spec:
+            containers:
+                - name: postgres-container
+                  image: postgres:13.1
+                  imagePullPolicy: "IfNotPresent"
+                  ports:
+                      - containerPort: 5432
+                  envFrom:
+                      - configMapRef:
+                          name: blogdb-config
+                  env:
+                      - name: POSTGRES_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: blogdb-secret
+                                key: POSTGRES_PASSWORD
+                  volumeMounts:
+                      - mountPath: /var/lib/postgresql/data
+                        name: postgredb
+                ## LEAVE THIS, and enable when 'PANIC could not locate a valid checkpoint record' shows
+                #   args:
+                #     - gosu  
+                #     - postgres
+                #     - pg_resetwal 
+                #     - /var/lib/postgresql/data
+            volumes:
+                - name: postgredb
+                  persistentVolumeClaim:
+                      claimName: blog-pv-claim

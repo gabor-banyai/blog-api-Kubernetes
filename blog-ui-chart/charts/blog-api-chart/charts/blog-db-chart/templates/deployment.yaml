@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: {{ include "blog-db-chart.fullname" . }}-deployment
+    labels:
+        {{- include "blog-db-chart.labels" . | nindent 8 }}
+spec:
+    replicas: {{ .Values.replicaCount }}
+    selector:
+        matchLabels:
+            {{- include "blog-db-chart.selectorLabels" . | nindent 12 }}
+    template:
+        metadata:
+            labels:
+                {{- include "blog-db-chart.selectorLabels" . | nindent 16 }}
+        spec:
+            {{- with .Values.imagePullSecrets }}
+            imagePullSecrets:
+                {{- toYaml . | nindent 16 }}
+            {{- end }}
+            serviceAccountName: {{ include "blog-db-chart.serviceAccountName" . }}
+            securityContext:
+                {{- toYaml .Values.podSecurityContext | nindent 16 }}
+            containers:
+                - name: {{ .Chart.Name }}
+                  securityContext:
+                      {{- toYaml .Values.securityContext | nindent 24 }}
+                  image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+                  imagePullPolicy: {{ .Values.image.pullPolicy }}
+                  ports:
+                      - containerPort: 5432
+                  resources:
+                      {{- toYaml .Values.resources | nindent 24 }}
+                  envFrom:
+                      - configMapRef:
+                          name: {{ include "blog-db-chart.fullname" . }}-config
+                  env:
+                      - name: POSTGRES_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ include "blog-db-chart.fullname" . }}-secret
+                                key: POSTGRES_PASSWORD
+            {{- with .Values.nodeSelector }}
+            nodeSelector:
+                {{- toYaml . | nindent 16 }}
+            {{- end }}
+            {{- with .Values.affinity }}
+            affinity:
+                {{- toYaml . | nindent 16 }}
+            {{- end }}
+            {{- with .Values.tolerations }}
+            tolerations:
+                {{- toYaml . | nindent 16 }}
+            {{- end }}

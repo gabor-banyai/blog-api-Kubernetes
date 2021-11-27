@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{ include "blog-api-chart.fullname" . }}-config
+    labels:
+        {{- include "blog-api-chart.labels" . | nindent 8 }}
+data:
+    POSTGRES_DB: {{ .Values.dbName }}
+    POSTGRES_USER: {{ .Values.dbUser }}
+    POSTGRES_ENV_NAME: {{ .Values.dbEnvName }}_PORT
